@@ -1,6 +1,6 @@
 # Helix EHR
 
-A minimal electronic health record system. Built with Next.js, Hasura, GraphQL, and TypeScript.
+A demo EHR project for learning Next.js App Router, Server Components, Server Actions, and modern React patterns. Built with Next.js, Hasura, GraphQL, and TypeScript.
 
 **[Live Demo](https://helix-ehr.vercel.app/dashboard)**
 
