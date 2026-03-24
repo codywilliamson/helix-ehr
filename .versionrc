@@ -1,0 +1,17 @@
+{
+  "types": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "chore", "section": "Chores", "hidden": false },
+    { "type": "docs", "section": "Documentation", "hidden": false },
+    { "type": "refactor", "section": "Refactors", "hidden": false },
+    { "type": "style", "section": "Styles", "hidden": true },
+    { "type": "test", "section": "Tests", "hidden": false },
+    { "type": "perf", "section": "Performance", "hidden": false },
+    { "type": "ci", "section": "CI/CD", "hidden": false },
+    { "type": "build", "section": "Build", "hidden": true },
+    { "type": "revert", "section": "Reverts", "hidden": false }
+  ],
+  "commitUrlFormat": "https://github.com/codywilliamson/helix-ehr/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/codywilliamson/helix-ehr/compare/{{previousTag}}...{{currentTag}}"
+}
