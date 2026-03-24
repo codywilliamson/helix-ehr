@@ -13,9 +13,20 @@
     5. Tracks all tables and relationships in Hasura via the metadata API
     6. Launches Next.js dev server
 
+.PARAMETER Runtime
+    Force a specific container runtime: 'podman' or 'docker'.
+    Overrides auto-detection.
+
 .EXAMPLE
     ./scripts/start-dev.ps1
+.EXAMPLE
+    ./scripts/start-dev.ps1 -Runtime podman
 #>
+
+param(
+    [ValidateSet('podman', 'docker')]
+    [string]$Runtime
+)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -37,7 +48,9 @@ function Get-ComposeCommand {
     return $null
 }
 
-$Runtime = Get-ComposeCommand
+if (-not $Runtime) {
+    $Runtime = Get-ComposeCommand
+}
 
 function Write-Step([string]$msg) {
     Write-Host "`n>> $msg" -ForegroundColor Cyan
