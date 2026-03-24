@@ -43,17 +43,41 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // TODO(auth): Replace this stub with a real database lookup.
-        // Query the `users` table, verify the password hash with bcrypt,
-        // and return the user object on success.
-        //
-        // Example:
-        //   const user = await db.query("SELECT * FROM users WHERE email = $1", [credentials.email]);
-        //   const valid = await bcrypt.compare(credentials.password, user.password_hash);
-        //   if (!valid) return null;
-        //   return { id: user.id, email: user.email, name: user.name, role: user.role };
+        // DEV-ONLY: Hardcoded demo users for local development.
+        // Replace with a real database lookup before any deployment.
+        const devUsers: (SessionUser & { password: string })[] = [
+          {
+            id: "1",
+            email: "admin@helix.dev",
+            name: "Dr. Admin",
+            role: "admin",
+            password: "password",
+          },
+          {
+            id: "2",
+            email: "provider@helix.dev",
+            name: "Dr. Smith",
+            role: "provider",
+            password: "password",
+          },
+        ];
 
-        return null;
+        const user = devUsers.find(
+          (u) =>
+            u.email === credentials.email &&
+            u.password === credentials.password,
+        );
+
+        if (!user) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       },
     }),
   ],

@@ -1,19 +1,21 @@
 /**
  * Client Component — Sign-in button for the landing page.
  *
- * This is a Client Component because the Button primitive from shadcn/ui
- * requires client-side rendering (it uses base-ui under the hood).
+ * This is a Client Component because it uses the `useRouter` hook
+ * for client-side navigation on click.
  *
- * Data: None. Renders a styled link to the login page.
+ * Data: None. Navigates to the login page on click.
  */
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function HomeSignInButton() {
+  const router = useRouter();
+
   return (
-    <Button className="w-full" render={<Link href="/login" />}>
+    <Button className="w-full" onClick={() => router.push("/login")}>
       Sign In
     </Button>
   );
