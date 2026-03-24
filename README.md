@@ -2,6 +2,8 @@
 
 A minimal electronic health record system. Built with Next.js, Hasura, GraphQL, and TypeScript.
 
+**[Live Demo](https://helix-ehr.vercel.app/dashboard)**
+
 ## Quick Start
 
 Requires Node.js, pnpm, and Docker.
