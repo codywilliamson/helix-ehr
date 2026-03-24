@@ -6,11 +6,12 @@
     Starts the full helix-ehr dev stack: Postgres, Hasura, seeds, table tracking, and Next.js.
 
 .DESCRIPTION
-    1. Tears down existing containers and volumes (clean slate)
-    2. Starts Postgres + Hasura via Docker Compose
-    3. Waits for Hasura to be healthy
-    4. Tracks all tables and relationships in Hasura via the metadata API
-    5. Launches Next.js dev server
+    1. Detects container runtime (podman or docker)
+    2. Tears down existing containers and volumes (clean slate)
+    3. Starts Postgres + Hasura via Compose
+    4. Waits for Hasura to be healthy
+    5. Tracks all tables and relationships in Hasura via the metadata API
+    6. Launches Next.js dev server
 
 .EXAMPLE
     ./scripts/start-dev.ps1
@@ -19,12 +20,24 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if (-not $Root) { $Root = Split-Path -Parent $PSScriptRoot }
 $Root = Resolve-Path (Join-Path $PSScriptRoot '..')
 
 $HasuraUrl = 'http://localhost:8080'
 $AdminSecret = 'your-hasura-admin-secret'
+
+# ── Detect container runtime ─────────────────────────────────────────────────
+
+function Get-ComposeCommand {
+    if (Get-Command 'podman' -ErrorAction SilentlyContinue) {
+        return 'podman'
+    }
+    if (Get-Command 'docker' -ErrorAction SilentlyContinue) {
+        return 'docker'
+    }
+    return $null
+}
+
+$Runtime = Get-ComposeCommand
 
 function Write-Step([string]$msg) {
     Write-Host "`n>> $msg" -ForegroundColor Cyan
@@ -76,7 +89,6 @@ function Add-HasuraSource {
             }
         } | Out-Null
     } catch {
-        # Source may already exist, that's fine
         Write-Host '   Source already exists or added.' -ForegroundColor Gray
     }
 }
@@ -118,59 +130,66 @@ function Track-Relationship([string]$table, [string]$name, [string]$type, [hasht
 
 Push-Location $Root
 try {
-    Write-Step 'Tearing down existing containers and volumes'
-    docker compose down -v 2>&1 | Out-Null
+    if (-not $Runtime) {
+        Write-Host "`n   No container runtime found (podman or docker)." -ForegroundColor Yellow
+        Write-Host "   Skipping backend — starting Next.js with mock data only.`n" -ForegroundColor Yellow
+    } else {
+        Write-Host "   Using runtime: $Runtime" -ForegroundColor Gray
 
-    Write-Step 'Starting Postgres + Hasura'
-    docker compose up -d
+        Write-Step 'Tearing down existing containers and volumes'
+        & $Runtime compose down -v 2>&1 | Out-Null
 
-    Write-Step 'Waiting for Hasura to be healthy'
-    Wait-ForHasura
+        Write-Step 'Starting Postgres + Hasura'
+        & $Runtime compose up -d
 
-    Write-Step 'Configuring Hasura metadata'
-    Add-HasuraSource
+        Write-Step 'Waiting for Hasura to be healthy'
+        Wait-ForHasura
 
-    Track-Table 'users'
-    Track-Table 'patients'
-    Track-Table 'visits'
+        Write-Step 'Configuring Hasura metadata'
+        Add-HasuraSource
 
-    # patients -> visits (one-to-many)
-    Track-Relationship 'patients' 'visits' 'array' @{
-        foreign_key_constraint_on = @{
-            table  = @{ schema = 'public'; name = 'visits' }
-            column = 'patient_id'
+        Track-Table 'users'
+        Track-Table 'patients'
+        Track-Table 'visits'
+
+        Track-Relationship 'patients' 'visits' 'array' @{
+            foreign_key_constraint_on = @{
+                table  = @{ schema = 'public'; name = 'visits' }
+                column = 'patient_id'
+            }
         }
-    }
 
-    # visits -> patient (many-to-one)
-    Track-Relationship 'visits' 'patient' 'object' @{
-        foreign_key_constraint_on = 'patient_id'
-    }
+        Track-Relationship 'visits' 'patient' 'object' @{
+            foreign_key_constraint_on = 'patient_id'
+        }
 
-    Write-Step 'Enabling aggregation queries'
-    foreach ($table in @('users', 'patients', 'visits')) {
-        try {
-            Invoke-HasuraMetadata @{
-                type = 'pg_set_table_customization'
-                args = @{
-                    source = 'default'
-                    table  = @{ schema = 'public'; name = $table }
-                    configuration = @{
-                        custom_root_fields = @{
-                            select_aggregate = "${table}_aggregate"
+        Write-Step 'Enabling aggregation queries'
+        foreach ($table in @('users', 'patients', 'visits')) {
+            try {
+                Invoke-HasuraMetadata @{
+                    type = 'pg_set_table_customization'
+                    args = @{
+                        source = 'default'
+                        table  = @{ schema = 'public'; name = $table }
+                        configuration = @{
+                            custom_root_fields = @{
+                                select_aggregate = "${table}_aggregate"
+                            }
                         }
                     }
-                }
-            } | Out-Null
-        } catch {
-            # already set
+                } | Out-Null
+            } catch {
+                # already set
+            }
         }
     }
 
     Write-Host "`n`n=== Stack is ready ===" -ForegroundColor Green
-    Write-Host "  Hasura Console:  $HasuraUrl/console" -ForegroundColor White
-    Write-Host "  Admin Secret:    $AdminSecret" -ForegroundColor White
-    Write-Host "  GraphQL:         $HasuraUrl/v1/graphql" -ForegroundColor White
+    if ($Runtime) {
+        Write-Host "  Hasura Console:  $HasuraUrl/console" -ForegroundColor White
+        Write-Host "  Admin Secret:    $AdminSecret" -ForegroundColor White
+        Write-Host "  GraphQL:         $HasuraUrl/v1/graphql" -ForegroundColor White
+    }
     Write-Host "  Next.js:         http://localhost:3000" -ForegroundColor White
     Write-Host "  Login:           admin@helix.dev / password`n" -ForegroundColor White
 
