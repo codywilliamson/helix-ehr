@@ -13,15 +13,19 @@
 import { Separator } from "@/components/ui/separator";
 import { mockPatients } from "@/lib/mock-data";
 import { PatientListClient } from "@/components/features/patient-list-client";
+import { AddPatientDialog } from "@/components/features/add-patient-dialog";
 
 export default function PatientsPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Patients</h1>
-        <p className="text-muted-foreground">
-          Manage and view all registered patients
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Patients</h1>
+          <p className="text-muted-foreground">
+            Manage and view all registered patients
+          </p>
+        </div>
+        <AddPatientDialog />
       </div>
 
       <Separator />
