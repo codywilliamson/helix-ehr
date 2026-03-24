@@ -10,6 +10,10 @@ services:
       POSTGRES_DB: helix_ehr
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./hasura/migrations/001_create_users/up.sql:/docker-entrypoint-initdb.d/01_users.sql:ro
+      - ./hasura/migrations/002_create_patients/up.sql:/docker-entrypoint-initdb.d/02_patients.sql:ro
+      - ./hasura/migrations/003_create_visits/up.sql:/docker-entrypoint-initdb.d/03_visits.sql:ro
+      - ./hasura/seeds/001_seed_data.sql:/docker-entrypoint-initdb.d/04_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
