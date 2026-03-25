@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/codywilliamson/helix-ehr/compare/v0.1.1...v0.1.2) (2026-03-25)
+
+
+### Features
+
+* add gke deployment starter ([b72904c](https://github.com/codywilliamson/helix-ehr/commit/b72904cdb6d7fe2c862c87079947eb41760733a0))
+
+
+### Chores
+
+* add release script with auto-bump, changelog, and push ([f05ddb7](https://github.com/codywilliamson/helix-ehr/commit/f05ddb7a47d436162f6fbe18cf62c5adbccb4283))
+
 ### [0.1.1](https://github.com/codywilliamson/helix-ehr/compare/v0.1.0...v0.1.1) (2026-03-24)
 
 
