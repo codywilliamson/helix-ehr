@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helix-ehr-config
+  namespace: helix-ehr
+data:
+  NEXTAUTH_URL: https://helix-ehr.example.com
+  NEXT_PUBLIC_HASURA_GRAPHQL_URL: https://graphql.example.com/v1/graphql

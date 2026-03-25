@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helix-ehr-hasura
+  namespace: helix-ehr
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: helix-ehr-hasura
+  template:
+    metadata:
+      labels:
+        app: helix-ehr-hasura
+    spec:
+      containers:
+        - name: hasura
+          image: hasura/graphql-engine:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: helix-ehr-hasura-config
+          env:
+            - name: HASURA_GRAPHQL_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: helix-ehr-secrets
+                  key: DATABASE_URL
+            - name: HASURA_GRAPHQL_ADMIN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: helix-ehr-secrets
+                  key: HASURA_GRAPHQL_ADMIN_SECRET
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"

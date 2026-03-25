@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helix-ehr-web
+  namespace: helix-ehr
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: helix-ehr-web
+  template:
+    metadata:
+      labels:
+        app: helix-ehr-web
+    spec:
+      containers:
+        - name: web
+          image: REGION-docker.pkg.dev/PROJECT_ID/helix-ehr/helix-ehr:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: helix-ehr-config
+            - secretRef:
+                name: helix-ehr-secrets
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helix-ehr-web
+  namespace: helix-ehr
+spec:
+  selector:
+    app: helix-ehr-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000

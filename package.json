@@ -2,10 +2,13 @@
   "name": "helix-ehr",
   "version": "0.1.1",
   "private": true,
+  "packageManager": "pnpm@10.23.0",
   "scripts": {
     "dev": "next dev",
+    "dev:stack": "pwsh ./scripts/start-dev.ps1",
     "build": "next build",
     "start": "next start",
+    "hasura:configure": "node ./scripts/configure-hasura.mjs",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

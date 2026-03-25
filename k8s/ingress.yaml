@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: helix-ehr-web
+  namespace: helix-ehr
+  annotations:
+    kubernetes.io/ingress.class: gce
+spec:
+  rules:
+    - host: helix-ehr.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: helix-ehr-web
+                port:
+                  number: 80
+    - host: graphql.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: helix-ehr-hasura
+                port:
+                  number: 8080

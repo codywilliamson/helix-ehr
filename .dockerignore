@@ -1,0 +1,14 @@
+.git
+.github
+.gitignore
+.husky
+.next
+coverage
+docs
+node_modules
+npm-debug.log*
+pnpm-debug.log*
+Dockerfile
+docker-compose.yml
+.env*
+!.env.example
