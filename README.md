@@ -32,6 +32,8 @@ cp .env.example .env.local
 pnpm dev:stack
 ```
 
+`pnpm dev:stack` now prefers `podman` when it is installed and starts the local backend directly, so it does not depend on the flaky `podman compose -> docker-compose` shim.
+
 If Hasura is already running somewhere else, you can re-apply the tracked tables and relationships with:
 
 ```bash

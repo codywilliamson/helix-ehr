@@ -75,7 +75,7 @@ async function trackRelationship(table, name, type, definition) {
       source: "default",
       table: { schema: "public", name: table },
       name,
-      definition,
+      using: definition,
     },
   }).catch((error) => {
     if (!String(error.message).includes("already exists")) {
